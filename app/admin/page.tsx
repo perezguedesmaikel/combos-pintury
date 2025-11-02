@@ -33,6 +33,18 @@ export default function AdminPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (showForm) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showForm]);
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     // Simple password protection (in production, use Supabase Auth)
@@ -160,6 +172,7 @@ export default function AdminPage() {
   }
 
   function resetForm() {
+    setEditingCombo(null);
     setFormData({
       name: '',
       description: '',
@@ -169,31 +182,27 @@ export default function AdminPage() {
       image: null,
     });
     setImagePreview(null);
-    setEditingCombo(null);
     setShowForm(false);
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8"
         >
-          <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Pintury - Panel Admin
-          </h1>
-          <form onSubmit={handleLogin} className="space-y-6">
+          <h1 className="text-2xl font-bold text-gray-800">Panel Administrativo</h1>
+          <p className="mt-2 text-gray-500">Ingresa la contraseña para gestionar los combos.</p>
+          <form onSubmit={handleLogin} className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 text-blue-950 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 text-blue-950 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Ingresa tu contraseña"
                 required
               />
@@ -261,163 +270,147 @@ export default function AdminPage() {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 z-[9999]">
-            {/* Backdrop - solo visible en desktop */}
+          <div className="fixed inset-0 z-[100]">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="hidden md:block absolute inset-0 bg-black/50"
+              className="hidden md:block absolute inset-0 bg-black/60"
               onClick={resetForm}
             />
-            
-            {/* Modal */}
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="modal-fullscreen bg-white flex flex-col md:absolute md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-2xl md:w-full md:max-h-[90vh] md:h-auto md:shadow-2xl"
-              style={{ 
-                height: '100dvh' // Dynamic viewport height para móviles
-              }}
-            >
-              {/* Header Sticky */}
-              <div className="flex justify-between items-center bg-white px-4 md:px-8 py-4 border-b shadow-sm">
-                <h2 className="text-lg md:text-2xl font-bold text-gray-800">
-                  {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
-                </h2>
-                <button
-                  onClick={resetForm}
-                  type="button"
-                  className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Contenido con scroll */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-
-              <form id="combo-form" onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nombre del Combo
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    required
-                  />
+            <div className="relative flex h-full w-full flex-col md:items-center md:justify-center">
+              <motion.div
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                className="relative flex h-full w-full flex-col bg-white md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-2xl md:shadow-2xl"
+              >
+                <div className="flex items-center justify-between bg-white px-4 md:px-8 py-4 border-b shadow-sm">
+                  <h2 className="text-lg md:text-2xl font-bold text-gray-800">
+                    {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
+                  </h2>
+                  <button
+                    onClick={resetForm}
+                    type="button"
+                    className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descripción
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    rows={3}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Precio ($)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                      className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Categoría
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="ej: familiar, individual"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Imagen
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center text-blue-950 gap-2 bg-gray-100 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
-                      <Upload className="w-5 h-5" />
-                      Subir Imagen
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  <form id="combo-form" onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Nombre del Combo
+                      </label>
                       <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        required
                       />
-                    </label>
-                    {imagePreview && (
-                      <div className="relative w-24 h-24 rounded-lg overflow-hidden">
-                        <Image
-                          src={imagePreview}
-                          alt="Preview"
-                          fill
-                          className="object-cover"
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Descripción
+                      </label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        rows={3}
+                        required
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Precio ($)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={formData.price}
+                          onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                          className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          required
                         />
                       </div>
-                    )}
-                  </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Categoría
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.category}
+                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                          className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="ej: familiar, individual"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Imagen
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <label className="flex items-center text-blue-950 gap-2 bg-gray-100 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
+                          <Upload className="w-5 h-5" />
+                          Subir Imagen
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                          />
+                        </label>
+                        {imagePreview && (
+                          <div className="relative w-24 h-24 rounded-lg overflow-hidden">
+                            <Image
+                              src={imagePreview}
+                              alt="Preview"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="available"
+                        checked={formData.available}
+                        onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+                        className="w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
+                      />
+                      <label htmlFor="available" className="text-sm font-medium text-gray-700">
+                        Disponible para clientes
+                      </label>
+                    </div>
+                  </form>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="available"
-                    checked={formData.available}
-                    onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
-                    className="w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
-                  />
-                  <label htmlFor="available" className="text-sm font-medium text-gray-700">
-                    Disponible para clientes
-                  </label>
+                <div className="flex flex-col sm:flex-row gap-3 bg-white px-4 md:px-8 py-4 border-t shadow-lg">
+                  <button
+                    type="submit"
+                    form="combo-form"
+                    disabled={loading}
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
+                  >
+                    {loading ? 'Guardando...' : editingCombo ? 'Actualizar' : 'Crear Combo'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="sm:px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    Cancelar
+                  </button>
                 </div>
-
-                </form>
-              </div>
-
-              {/* Footer Sticky */}
-              <div className="flex flex-col sm:flex-row gap-3 bg-white px-4 md:px-8 py-4 border-t shadow-lg">
-                <button
-                  type="submit"
-                  form="combo-form"
-                  disabled={loading}
-                  className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
-                >
-                  {loading ? 'Guardando...' : editingCombo ? 'Actualizar' : 'Crear Combo'}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="sm:px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         )}
 
@@ -488,7 +481,7 @@ export default function AdminPage() {
         {combos.length === 0 && (
           <div className="text-center py-20">
             <p className="text-xl text-gray-600">No hay combos creados aún</p>
-            <p className="text-gray-500 mt-2">Haz clic en "Agregar Nuevo Combo" para comenzar</p>
+            <p className="text-gray-500 mt-2">Haz clic en &quot;Agregar Nuevo Combo&quot; para comenzar</p>
           </div>
         )}
       </main>
