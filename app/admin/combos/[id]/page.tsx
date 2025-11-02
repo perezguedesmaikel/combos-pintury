@@ -206,8 +206,8 @@ export default function EditarComboPage() {
               </label>
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Link href="/admin" className="flex-1">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Link href="/admin" className="w-full sm:flex-1">
                 <button
                   type="button"
                   className="w-full bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
@@ -218,10 +218,10 @@ export default function EditarComboPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
+                className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
               >
-                <Save className="w-5 h-5" />
-                {loading ? 'Guardando...' : 'Guardar Cambios'}
+                <Save className="w-5 h-5 flex-shrink-0" />
+                <span className="whitespace-nowrap">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
               </button>
             </div>
           </form>
