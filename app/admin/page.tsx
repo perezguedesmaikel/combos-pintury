@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, LogOut, Home, Upload, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Home } from 'lucide-react';
 import { mockCombos } from '@/lib/mockData';
-import { Combo, ComboFormData } from '@/types/combo';
+import { Combo } from '@/types/combo';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -13,40 +12,24 @@ export default function AdminPage() {
   const [combos, setCombos] = useState<Combo[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [editingCombo, setEditingCombo] = useState<Combo | null>(null);
-  const [formData, setFormData] = useState<ComboFormData>({
-    name: '',
-    description: '',
-    price: 0,
-    category: 'general',
-    available: true,
-    image: null,
-  });
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+
+  async function fetchCombos() {
+    try {
+      // Usando datos mock temporalmente
+      const data = [...mockCombos];
+      setCombos(data);
+    } catch (error) {
+      console.error('Error fetching combos:', error);
+    }
+  }
 
   useEffect(() => {
-    setMounted(true);
     const session = localStorage.getItem('admin_session');
     if (session === 'authenticated') {
       setIsAuthenticated(true);
       fetchCombos();
     }
   }, []);
-
-  useEffect(() => {
-    if (showForm) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [showForm]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -66,88 +49,6 @@ export default function AdminPage() {
     setPassword('');
   }
 
-  async function fetchCombos() {
-    try {
-      // Usando datos mock temporalmente
-      const data = [...mockCombos];
-      setCombos(data);
-    } catch (error) {
-      console.error('Error fetching combos:', error);
-    }
-  }
-
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData({ ...formData, image: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  async function uploadImage(file: File): Promise<string | null> {
-    try {
-      // Simular subida de imagen con URL de ejemplo
-      // En producción esto usará Supabase Storage
-      const reader = new FileReader();
-      return new Promise((resolve) => {
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      return null;
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      let imageUrl = editingCombo?.image_url || null;
-
-      if (formData.image) {
-        const uploadedUrl = await uploadImage(formData.image);
-        if (uploadedUrl) imageUrl = uploadedUrl;
-      }
-
-      const comboData: Combo = {
-        id: editingCombo?.id || `${Date.now()}`,
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        category: formData.category,
-        available: formData.available,
-        image_url: imageUrl,
-        created_at: editingCombo?.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-
-      if (editingCombo) {
-        // Actualizar combo existente
-        setCombos(combos.map(c => c.id === editingCombo.id ? comboData : c));
-        alert('Combo actualizado (mock - no persistente)');
-      } else {
-        // Agregar nuevo combo
-        setCombos([comboData, ...combos]);
-        alert('Combo creado (mock - no persistente)');
-      }
-
-      resetForm();
-    } catch (error) {
-      console.error('Error saving combo:', error);
-      alert('Error al guardar el combo');
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function handleDelete(id: string) {
     if (!confirm('¿Estás seguro de eliminar este combo?')) return;
 
@@ -158,34 +59,6 @@ export default function AdminPage() {
       console.error('Error deleting combo:', error);
       alert('Error al eliminar el combo');
     }
-  }
-
-  function handleEdit(combo: Combo) {
-    setEditingCombo(combo);
-    setFormData({
-      name: combo.name,
-      description: combo.description,
-      price: combo.price,
-      category: combo.category,
-      available: combo.available,
-      image: null,
-    });
-    setImagePreview(combo.image_url);
-    setShowForm(true);
-  }
-
-  function resetForm() {
-    setEditingCombo(null);
-    setFormData({
-      name: '',
-      description: '',
-      price: 0,
-      category: 'general',
-      available: true,
-      image: null,
-    });
-    setImagePreview(null);
-    setShowForm(false);
   }
 
   if (!isAuthenticated) {
@@ -261,160 +134,16 @@ export default function AdminPage() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Add Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowForm(true)}
-          className="mb-8 flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <Plus className="w-5 h-5" />
-          Agregar Nuevo Combo
-        </motion.button>
-
-        {/* Form Modal usando createPortal para renderizar fuera del contenedor */}
-        {showForm && mounted && createPortal(
-          <div className="fixed inset-0 z-[9999] flex flex-col bg-white md:bg-black/60 md:items-center md:justify-center animate-in fade-in duration-300">
-            {/* Backdrop para desktop - clickeable para cerrar */}
-            <div 
-              className="hidden md:block absolute inset-0 -z-10"
-              onClick={resetForm}
-            />
-            
-            {/* Contenedor del Modal */}
-            <div className="flex h-full w-full flex-col bg-white md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-2xl md:shadow-2xl animate-in slide-in-from-bottom duration-300 md:animate-in md:fade-in md:zoom-in-95">
-              {/* Header */}
-              <div className="flex-shrink-0 flex items-center justify-between bg-white px-4 md:px-8 py-4 border-b shadow-sm">
-                <h2 className="text-lg md:text-2xl font-bold text-gray-800">
-                  {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
-                </h2>
-                <button
-                  onClick={resetForm}
-                  type="button"
-                  className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              
-              {/* Contenido con scroll */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <form id="combo-form" onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nombre del Combo
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Descripción
-                      </label>
-                      <textarea
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        rows={3}
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Precio ($)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={formData.price}
-                          onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                          className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Categoría
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.category}
-                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                          className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          placeholder="ej: familiar, individual"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Imagen
-                      </label>
-                      <div className="flex items-center gap-4">
-                        <label className="flex items-center text-blue-950 gap-2 bg-gray-100 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
-                          <Upload className="w-5 h-5" />
-                          Subir Imagen
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
-                        </label>
-                        {imagePreview && (
-                          <div className="relative w-24 h-24 rounded-lg overflow-hidden">
-                            <Image
-                              src={imagePreview}
-                              alt="Preview"
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        id="available"
-                        checked={formData.available}
-                        onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
-                        className="w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
-                      />
-                      <label htmlFor="available" className="text-sm font-medium text-gray-700">
-                        Disponible para clientes
-                      </label>
-                    </div>
-                  </form>
-                </div>
-                
-                {/* Footer */}
-                <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 bg-white px-4 md:px-8 py-4 border-t shadow-lg">
-                  <button
-                    type="submit"
-                    form="combo-form"
-                    disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
-                  >
-                    {loading ? 'Guardando...' : editingCombo ? 'Actualizar' : 'Crear Combo'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="sm:px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-            </div>
-          </div>,
-          document.body
-        )}
+        <Link href="/admin/combos/nuevo">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mb-8 flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+          >
+            <Plus className="w-5 h-5" />
+            Agregar Nuevo Combo
+          </motion.button>
+        </Link>
 
         {/* Combos List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -460,13 +189,12 @@ export default function AdminPage() {
                 </p>
 
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(combo)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                    Editar
-                  </button>
+                  <Link href={`/admin/combos/${combo.id}`} className="flex-1">
+                    <button className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                      <Edit2 className="w-4 h-4" />
+                      Editar
+                    </button>
+                  </Link>
                   <button
                     onClick={() => handleDelete(combo.id)}
                     className="flex-1 flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors"
