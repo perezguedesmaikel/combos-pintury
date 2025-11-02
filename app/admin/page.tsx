@@ -264,22 +264,23 @@ export default function AdminPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+            className="fixed inset-0 bg-black/50 z-50 overflow-y-auto"
             onClick={() => resetForm()}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-8 w-full max-w-2xl my-8"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
+            <div className="min-h-screen px-4 py-8 flex items-start justify-center">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-2xl p-6 md:p-8 w-full max-w-2xl"
+              >
+              <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 -mx-6 md:-mx-8 px-6 md:px-8 py-4 border-b">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
                   {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
                 </h2>
                 <button
                   onClick={resetForm}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 p-2"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -383,7 +384,7 @@ export default function AdminPage() {
                   </label>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white pb-4 -mx-6 md:-mx-8 px-6 md:px-8 border-t mt-4">
                   <button
                     type="submit"
                     disabled={loading}
@@ -394,13 +395,14 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="sm:px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
                   >
                     Cancelar
                   </button>
                 </div>
               </form>
-            </motion.div>
+              </motion.div>
+            </div>
           </motion.div>
         )}
 
