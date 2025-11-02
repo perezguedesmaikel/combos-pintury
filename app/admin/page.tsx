@@ -268,37 +268,34 @@ export default function AdminPage() {
           Agregar Nuevo Combo
         </motion.button>
 
-        {/* Form Modal */}
+        {/* Form Modal - Sin Framer Motion, solo Tailwind CSS */}
         {showForm && (
-          <div className="fixed inset-0 z-[100]">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="hidden md:block absolute inset-0 bg-black/60"
+          <div className="fixed inset-0 z-[9999] flex flex-col bg-white md:bg-black/60 md:items-center md:justify-center animate-in fade-in duration-300">
+            {/* Backdrop para desktop - clickeable para cerrar */}
+            <div 
+              className="hidden md:block absolute inset-0 -z-10"
               onClick={resetForm}
             />
-            <div className="relative flex h-full w-full flex-col md:items-center md:justify-center">
-              <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="relative flex h-full w-full flex-col bg-white md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-2xl md:shadow-2xl"
-              >
-                <div className="flex items-center justify-between bg-white px-4 md:px-8 py-4 border-b shadow-sm">
-                  <h2 className="text-lg md:text-2xl font-bold text-gray-800">
-                    {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
-                  </h2>
-                  <button
-                    onClick={resetForm}
-                    type="button"
-                    className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-                <div className="flex-1 overflow-y-auto overscroll-contain">
-                  <form id="combo-form" onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6">
+            
+            {/* Contenedor del Modal */}
+            <div className="flex h-full w-full flex-col bg-white md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-2xl md:shadow-2xl animate-in slide-in-from-bottom duration-300 md:animate-in md:fade-in md:zoom-in-95">
+              {/* Header */}
+              <div className="flex-shrink-0 flex items-center justify-between bg-white px-4 md:px-8 py-4 border-b shadow-sm">
+                <h2 className="text-lg md:text-2xl font-bold text-gray-800">
+                  {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
+                </h2>
+                <button
+                  onClick={resetForm}
+                  type="button"
+                  className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              {/* Contenido con scroll */}
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <form id="combo-form" onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Nombre del Combo
@@ -392,7 +389,9 @@ export default function AdminPage() {
                     </div>
                   </form>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3 bg-white px-4 md:px-8 py-4 border-t shadow-lg">
+                
+                {/* Footer */}
+                <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 bg-white px-4 md:px-8 py-4 border-t shadow-lg">
                   <button
                     type="submit"
                     form="combo-form"
@@ -409,7 +408,6 @@ export default function AdminPage() {
                     Cancelar
                   </button>
                 </div>
-              </motion.div>
             </div>
           </div>
         )}
