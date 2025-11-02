@@ -261,31 +261,41 @@ export default function AdminPage() {
 
         {/* Form Modal */}
         {showForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/50 z-50"
-          >
+          <div className="fixed inset-0 z-50">
+            {/* Backdrop - solo visible en desktop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="hidden md:block absolute inset-0 bg-black/50"
+              onClick={resetForm}
+            />
+            
+            {/* Modal */}
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="fixed inset-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-white md:rounded-2xl md:max-w-2xl md:w-full md:max-h-[90vh] h-full md:h-auto overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="absolute inset-0 bg-white flex flex-col md:relative md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-2xl md:w-full md:max-h-[90vh] md:shadow-2xl"
             >
-              <div className="flex justify-between items-center sticky top-0 bg-white z-10 px-6 md:px-8 py-4 border-b">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+              {/* Header Sticky */}
+              <div className="flex justify-between items-center bg-white px-4 md:px-8 py-4 border-b shadow-sm">
+                <h2 className="text-lg md:text-2xl font-bold text-gray-800">
                   {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
                 </h2>
                 <button
                   onClick={resetForm}
-                  className="text-gray-500 hover:text-gray-700 p-2"
+                  type="button"
+                  className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <form id="combo-form" onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
+              {/* Contenido con scroll */}
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+
+              <form id="combo-form" onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nombre del Combo
@@ -347,7 +357,7 @@ export default function AdminPage() {
                     Imagen
                   </label>
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
+                    <label className="flex items-center text-blue-950 gap-2 bg-gray-100 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
                       <Upload className="w-5 h-5" />
                       Subir Imagen
                       <input
@@ -384,8 +394,10 @@ export default function AdminPage() {
                 </div>
 
                 </form>
+              </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-white px-6 md:px-8 py-4 border-t">
+              {/* Footer Sticky */}
+              <div className="flex flex-col sm:flex-row gap-3 bg-white px-4 md:px-8 py-4 border-t shadow-lg">
                 <button
                   type="submit"
                   form="combo-form"
@@ -403,7 +415,7 @@ export default function AdminPage() {
                 </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
 
         {/* Combos List */}

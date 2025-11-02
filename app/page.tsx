@@ -47,7 +47,7 @@ export default function Home() {
   }
 
   function handleOrder(combo: Combo) {
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5353000000';
+    const whatsappNumber = '5353910568';
     const message = `Hola! Me interesa el combo: *${combo.name}* - $${combo.price.toFixed(2)}`;
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
@@ -161,7 +161,7 @@ export default function Home() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`, '_blank')}
+                onClick={() => window.open('https://wa.me/5353910568', '_blank')}
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full inline-flex items-center gap-2 transition-colors shadow-lg"
               >
                 Contáctanos por WhatsApp
