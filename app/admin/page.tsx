@@ -261,7 +261,7 @@ export default function AdminPage() {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 z-50">
+          <div className="fixed inset-0 z-[9999]">
             {/* Backdrop - solo visible en desktop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -276,7 +276,10 @@ export default function AdminPage() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="absolute inset-0 bg-white flex flex-col md:relative md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-2xl md:w-full md:max-h-[90vh] md:shadow-2xl"
+              className="modal-fullscreen bg-white flex flex-col md:absolute md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-2xl md:w-full md:max-h-[90vh] md:h-auto md:shadow-2xl"
+              style={{ 
+                height: '100dvh' // Dynamic viewport height para móviles
+              }}
             >
               {/* Header Sticky */}
               <div className="flex justify-between items-center bg-white px-4 md:px-8 py-4 border-b shadow-sm">
