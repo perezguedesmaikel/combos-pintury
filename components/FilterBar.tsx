@@ -17,7 +17,7 @@ export default function FilterBar({ categories, selectedCategory, onCategoryChan
     <div className="mb-8">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md mb-4"
+        className="md:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md mb-4 font-bold text-blue-950"
       >
         <Filter className="w-5 h-5" />
         Filtros
