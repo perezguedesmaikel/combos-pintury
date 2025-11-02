@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, LogOut, Home, Upload, X } from 'lucide-react';
 import { mockCombos } from '@/lib/mockData';
@@ -24,8 +25,10 @@ export default function AdminPage() {
     image: null,
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const session = localStorage.getItem('admin_session');
     if (session === 'authenticated') {
       setIsAuthenticated(true);
@@ -268,8 +271,8 @@ export default function AdminPage() {
           Agregar Nuevo Combo
         </motion.button>
 
-        {/* Form Modal - Sin Framer Motion, solo Tailwind CSS */}
-        {showForm && (
+        {/* Form Modal usando createPortal para renderizar fuera del contenedor */}
+        {showForm && mounted && createPortal(
           <div className="fixed inset-0 z-[9999] flex flex-col bg-white md:bg-black/60 md:items-center md:justify-center animate-in fade-in duration-300">
             {/* Backdrop para desktop - clickeable para cerrar */}
             <div 
@@ -409,7 +412,8 @@ export default function AdminPage() {
                   </button>
                 </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Combos List */}
