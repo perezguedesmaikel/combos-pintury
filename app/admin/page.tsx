@@ -264,17 +264,16 @@ export default function AdminPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/50 z-50 overflow-y-auto"
-            onClick={() => resetForm()}
+            className="fixed inset-0 bg-black/50 z-50"
           >
-            <div className="min-h-screen px-4 py-8 flex items-start justify-center">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-2xl p-6 md:p-8 w-full max-w-2xl"
-              >
-              <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 -mx-6 md:-mx-8 px-6 md:px-8 py-4 border-b">
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              transition={{ type: 'spring', damping: 25 }}
+              className="fixed inset-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-white md:rounded-2xl md:max-w-2xl md:w-full md:max-h-[90vh] h-full md:h-auto overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center sticky top-0 bg-white z-10 px-6 md:px-8 py-4 border-b">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">
                   {editingCombo ? 'Editar Combo' : 'Nuevo Combo'}
                 </h2>
@@ -286,7 +285,7 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form id="combo-form" onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nombre del Combo
@@ -295,7 +294,7 @@ export default function AdminPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -307,7 +306,7 @@ export default function AdminPage() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     rows={3}
                     required
                   />
@@ -323,7 +322,7 @@ export default function AdminPage() {
                       step="0.01"
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       required
                     />
                   </div>
@@ -336,7 +335,7 @@ export default function AdminPage() {
                       type="text"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       placeholder="ej: familiar, individual"
                       required
                     />
@@ -384,25 +383,26 @@ export default function AdminPage() {
                   </label>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white pb-4 -mx-6 md:-mx-8 px-6 md:px-8 border-t mt-4">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
-                  >
-                    {loading ? 'Guardando...' : editingCombo ? 'Actualizar' : 'Crear Combo'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="sm:px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-              </motion.div>
-            </div>
+                </form>
+
+              <div className="flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-white px-6 md:px-8 py-4 border-t">
+                <button
+                  type="submit"
+                  form="combo-form"
+                  disabled={loading}
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
+                >
+                  {loading ? 'Guardando...' : editingCombo ? 'Actualizar' : 'Crear Combo'}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="sm:px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
 
