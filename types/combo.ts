@@ -11,10 +11,9 @@ export interface Combo {
 }
 
 export interface ComboFormData {
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  available: boolean;
-  image?: File | null;
+    name: string;
+    description: string;
+    price: number;
+    category: string;
+    image_url: string;
 }
