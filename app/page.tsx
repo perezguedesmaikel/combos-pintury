@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Lock, DollarSign } from 'lucide-react';
-import { mockCombos } from '@/lib/mockData';
+import { ShoppingBag, Lock } from 'lucide-react';
+import { errorMessage, getPublicCombos } from '@/lib/api';
 import { Combo } from '@/types/combo';
 import ComboCard from '@/components/ComboCard';
 import FilterBar from '@/components/FilterBar';
@@ -11,44 +11,42 @@ import Link from 'next/link';
 
 export default function Home() {
   const [combos, setCombos] = useState<Combo[]>([]);
-  const [filteredCombos, setFilteredCombos] = useState<Combo[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5353910568';
+  const filteredCombos = useMemo(
+    () => selectedCategory === 'all'
+      ? combos
+      : combos.filter(combo => combo.category === selectedCategory),
+    [combos, selectedCategory],
+  );
 
   useEffect(() => {
     fetchCombos();
   }, []);
 
-  useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredCombos(combos);
-    } else {
-      setFilteredCombos(combos.filter(combo => combo.category === selectedCategory));
-    }
-  }, [selectedCategory, combos]);
-
   async function fetchCombos() {
     try {
-      // Usando datos mock temporalmente
-      const data = mockCombos;
+      setError(null);
+      const data = await getPublicCombos();
       
       setCombos(data);
-      setFilteredCombos(data);
       
       // Extract unique categories
       const uniqueCategories = Array.from(new Set(data.map(combo => combo.category)));
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching combos:', error);
+      setError(errorMessage(error));
     } finally {
       setLoading(false);
     }
   }
 
   function handleOrder(combo: Combo) {
-    const whatsappNumber = '5353910568';
-    const message = `Hola! Me interesa el combo: *${combo.name}* - $${combo.price.toFixed(2)}`;
+    const message = `¡Hola! Me interesa el combo: *${combo.name}* - ${combo.price.toFixed(2)} ${combo.currency}`;
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   }
@@ -122,6 +120,17 @@ export default function Home() {
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-500"></div>
           </div>
+        ) : error ? (
+          <div className="mx-auto max-w-xl rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+            <h3 className="text-xl font-bold text-red-700">No pudimos cargar los combos</h3>
+            <p className="mt-2 text-red-600">{error}</p>
+            <button
+              onClick={fetchCombos}
+              className="mt-5 rounded-xl bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-700"
+            >
+              Intentar de nuevo
+            </button>
+          </div>
         ) : filteredCombos.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -161,7 +170,7 @@ export default function Home() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.open('https://wa.me/5353910568', '_blank')}
+                onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full inline-flex items-center gap-2 transition-colors shadow-lg"
               >
                 Contáctanos por WhatsApp
@@ -170,7 +179,7 @@ export default function Home() {
           </div>
           <div className="border-t border-gray-700 pt-6 text-center">
             <p className="text-sm text-gray-400">
-              © 2025 Pintury Remesas y Combos. Todos los derechos reservados.
+              © 2026 Pintury Remesas y Combos. Todos los derechos reservados.
             </p>
           </div>
         </div>

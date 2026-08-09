@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { ComboFormData, Combo } from '@/types/combo';
-import { mockCombos } from '@/lib/mockData';
+import { errorMessage, getAdminCombo, updateCombo } from '@/lib/api';
 
 export default function EditarComboPage() {
   const router = useRouter();
@@ -18,6 +18,7 @@ export default function EditarComboPage() {
     name: '',
     description: '',
     price: 0,
+    currency: 'USD',
     category: 'general',
     available: true,
     image: null,
@@ -25,23 +26,28 @@ export default function EditarComboPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
-    // Cargar combo existente
-    const comboId = params.id as string;
-    const foundCombo = mockCombos.find(c => c.id === comboId);
-    
-    if (foundCombo) {
-      setCombo(foundCombo);
-      setFormData({
-        name: foundCombo.name,
-        description: foundCombo.description,
-        price: foundCombo.price,
-        category: foundCombo.category,
-        available: foundCombo.available,
-        image: null,
-      });
-      setImagePreview(foundCombo.image_url);
+    async function loadCombo() {
+      try {
+        const foundCombo = await getAdminCombo(params.id as string);
+        setCombo(foundCombo);
+        setFormData({
+          name: foundCombo.name,
+          description: foundCombo.description,
+          price: foundCombo.price,
+          currency: foundCombo.currency,
+          category: foundCombo.category,
+          available: foundCombo.available,
+          image: null,
+        });
+        setImagePreview(foundCombo.image_url);
+      } catch (error) {
+        alert(errorMessage(error));
+        router.replace('/admin');
+      }
     }
-  }, [params.id]);
+
+    loadCombo();
+  }, [params.id, router]);
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -60,12 +66,11 @@ export default function EditarComboPage() {
     setLoading(true);
 
     try {
-      // TODO: Aquí se actualizaría en Supabase
-      alert('Combo actualizado exitosamente (mock)');
+      await updateCombo(params.id as string, formData);
       router.push('/admin');
     } catch (error) {
       console.error('Error updating combo:', error);
-      alert('Error al actualizar el combo');
+      alert(errorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -134,7 +139,7 @@ export default function EditarComboPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
                   Precio ($)
@@ -148,6 +153,20 @@ export default function EditarComboPage() {
                   className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   required
                 />
+              </div>
+              <div>
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
+                  Moneda
+                </label>
+                <select
+                  id="currency"
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value as 'USD' | 'CUP' })}
+                  className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                >
+                  <option value="USD">USD</option>
+                  <option value="CUP">CUP</option>
+                </select>
               </div>
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
@@ -175,7 +194,7 @@ export default function EditarComboPage() {
                   Cambiar Imagen
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     onChange={handleImageChange}
                     className="hidden"
                   />

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ComboFormData } from '@/types/combo';
+import { createCombo, errorMessage } from '@/lib/api';
 
 export default function NuevoComboPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function NuevoComboPage() {
     name: '',
     description: '',
     price: 0,
+    currency: 'USD',
     category: 'general',
     available: true,
     image: null,
@@ -38,12 +40,11 @@ export default function NuevoComboPage() {
     setLoading(true);
 
     try {
-      // TODO: Aquí se guardaría en Supabase
-      alert('Combo creado exitosamente (mock)');
+      await createCombo(formData);
       router.push('/admin');
     } catch (error) {
       console.error('Error saving combo:', error);
-      alert('Error al guardar el combo');
+      alert(errorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -104,7 +105,7 @@ export default function NuevoComboPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
                   Precio ($)
@@ -118,6 +119,20 @@ export default function NuevoComboPage() {
                   className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   required
                 />
+              </div>
+              <div>
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
+                  Moneda
+                </label>
+                <select
+                  id="currency"
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value as 'USD' | 'CUP' })}
+                  className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                >
+                  <option value="USD">USD</option>
+                  <option value="CUP">CUP</option>
+                </select>
               </div>
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
@@ -145,7 +160,7 @@ export default function NuevoComboPage() {
                   Subir Imagen
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     onChange={handleImageChange}
                     className="hidden"
                   />

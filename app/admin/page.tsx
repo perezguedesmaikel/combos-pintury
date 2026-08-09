@@ -3,62 +3,110 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, LogOut, Home } from 'lucide-react';
-import { mockCombos } from '@/lib/mockData';
 import { Combo } from '@/types/combo';
+import {
+  clearAdminToken,
+  ApiError,
+  deleteCombo,
+  errorMessage,
+  getAdminCombos,
+  hasAdminToken,
+  login,
+  logout,
+  verifyAdminSession,
+} from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function AdminPage() {
   const [combos, setCombos] = useState<Combo[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchCombos() {
     try {
-      // Usando datos mock temporalmente
-      const data = [...mockCombos];
-      setCombos(data);
+      setCombos(await getAdminCombos());
+      setError(null);
     } catch (error) {
       console.error('Error fetching combos:', error);
+      setError(errorMessage(error));
+      if (error instanceof ApiError && error.status === 401) {
+        setIsAuthenticated(false);
+      }
     }
   }
 
   useEffect(() => {
-    const session = localStorage.getItem('admin_session');
-    if (session === 'authenticated') {
-      setIsAuthenticated(true);
-      fetchCombos();
+    async function restoreSession() {
+      if (!hasAdminToken()) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        await verifyAdminSession();
+        setIsAuthenticated(true);
+        await fetchCombos();
+      } catch (error) {
+        clearAdminToken();
+        setError(errorMessage(error));
+      } finally {
+        setLoading(false);
+      }
     }
+
+    restoreSession();
   }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    // Simple password protection (in production, use Supabase Auth)
-    if (password === 'admin123') {
-      localStorage.setItem('admin_session', 'authenticated');
+    setLoading(true);
+    setError(null);
+
+    try {
+      await login(email, password);
       setIsAuthenticated(true);
-      fetchCombos();
-    } else {
-      alert('Contraseña incorrecta');
+      setPassword('');
+      await fetchCombos();
+    } catch (error) {
+      setError(errorMessage(error));
+    } finally {
+      setLoading(false);
     }
   }
 
-  function handleLogout() {
-    localStorage.removeItem('admin_session');
+  async function handleLogout() {
+    try {
+      await logout();
+    } catch {
+      clearAdminToken();
+    }
     setIsAuthenticated(false);
-    setPassword('');
+    setCombos([]);
+    setError(null);
   }
 
   async function handleDelete(id: string) {
     if (!confirm('¿Estás seguro de eliminar este combo?')) return;
 
     try {
-      setCombos(combos.filter(c => c.id !== id));
-      alert('Combo eliminado (mock - no persistente)');
+      await deleteCombo(id);
+      setCombos(current => current.filter(combo => combo.id !== id));
     } catch (error) {
       console.error('Error deleting combo:', error);
-      alert('Error al eliminar el combo');
+      alert(errorMessage(error));
     }
+  }
+
+  if (loading && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-200 border-t-orange-500" />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
@@ -70,29 +118,42 @@ export default function AdminPage() {
           className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8"
         >
           <h1 className="text-2xl font-bold text-gray-800">Panel Administrativo</h1>
-          <p className="mt-2 text-gray-500">Ingresa la contraseña para gestionar los combos.</p>
+          <p className="mt-2 text-gray-500">Ingresa tus credenciales para gestionar los combos.</p>
           <form onSubmit={handleLogin} className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Correo</label>
               <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 text-blue-950 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                autoComplete="username"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+              <input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 text-blue-950 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Ingresa tu contraseña"
+                autoComplete="current-password"
                 required
               />
             </div>
+            {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-60"
             >
-              Ingresar
+              {loading ? 'Ingresando...' : 'Ingresar'}
             </button>
           </form>
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Contraseña por defecto: <code className="bg-gray-100 px-2 py-1 rounded">admin123</code>
-          </p>
         </motion.div>
       </div>
     );
@@ -133,6 +194,9 @@ export default function AdminPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
+        )}
         {/* Add Button */}
         <Link href="/admin/combos/nuevo">
           <motion.button
@@ -180,7 +244,7 @@ export default function AdminPage() {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xl font-bold text-gray-800">{combo.name}</h3>
                   <span className="text-lg font-bold text-orange-600">
-                    ${combo.price.toFixed(2)}
+                    {combo.price.toFixed(2)} {combo.currency}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mb-2 line-clamp-2">{combo.description}</p>

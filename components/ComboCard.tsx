@@ -32,7 +32,7 @@ export default function ComboCard({ combo, onOrder }: ComboCardProps) {
           </div>
         )}
         <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
-          ${combo.price.toFixed(2)}
+          {combo.price.toFixed(2)} {combo.currency}
         </div>
       </div>
 

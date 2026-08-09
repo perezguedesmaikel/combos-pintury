@@ -1,5 +1,7 @@
 # Instrucciones para Configurar Supabase
 
+> **Obsoleto:** la aplicación actual usa la API Laravel, Firestore y Cloud Storage. Este documento se conserva únicamente como referencia del prototipo anterior.
+
 ## Paso 1: Crear Proyecto en Supabase
 
 1. Ve a https://supabase.com

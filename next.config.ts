@@ -10,7 +10,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**.supabase.co',
+        hostname: 'storage.googleapis.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
       },
     ],
   },

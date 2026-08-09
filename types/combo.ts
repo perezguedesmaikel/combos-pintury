@@ -3,6 +3,7 @@ export interface Combo {
   name: string;
   description: string;
   price: number;
+  currency: 'USD' | 'CUP';
   image_url: string | null;
   category: string;
   available: boolean;
@@ -14,6 +15,7 @@ export interface ComboFormData {
   name: string;
   description: string;
   price: number;
+  currency: 'USD' | 'CUP';
   category: string;
   available: boolean;
   image?: File | null;
