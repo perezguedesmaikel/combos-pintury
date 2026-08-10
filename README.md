@@ -14,7 +14,7 @@ Variables:
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
-NEXT_PUBLIC_WHATSAPP_NUMBER=5353910568
+NEXT_PUBLIC_WHATSAPP_NUMBER=5354157794
 ```
 
 La API debe permitir `http://localhost:3000` en `CORS_ALLOWED_ORIGINS`.
@@ -31,8 +31,8 @@ npm run build
 Mantener el frontend en Netlify evita consumir recursos de Cloud Run. En la configuración del sitio define:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://<servicio>.run.app/api/v1
-NEXT_PUBLIC_WHATSAPP_NUMBER=<numero-con-codigo-de-pais>
+NEXT_PUBLIC_API_BASE_URL=https://pintury-api-444654869113.us-east1.run.app/api/v1
+NEXT_PUBLIC_WHATSAPP_NUMBER=5354157794
 ```
 
 Después inicia un nuevo deploy. El origen exacto de Netlify, sin barra final, debe configurarse también en `CORS_ALLOWED_ORIGINS` del backend.

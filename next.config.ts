@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'storage.googleapis.com',
+        hostname: 'pintury-api-444654869113.us-east1.run.app',
       },
       {
         protocol: 'http',

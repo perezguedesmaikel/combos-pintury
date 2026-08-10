@@ -15,7 +15,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5353910568';
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5354157794';
   const filteredCombos = useMemo(
     () => selectedCategory === 'all'
       ? combos
