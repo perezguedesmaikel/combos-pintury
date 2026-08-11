@@ -6,6 +6,3 @@
   NODE_VERSION = "22"
   NEXT_PUBLIC_API_BASE_URL = "https://pintury-api-444654869113.us-east1.run.app/api/v1"
   NEXT_PUBLIC_WHATSAPP_NUMBER = "5354157794"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
