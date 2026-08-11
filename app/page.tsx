@@ -1,188 +1,67 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Lock } from 'lucide-react';
-import { errorMessage, getPublicCombos } from '@/lib/api';
-import { Combo } from '@/types/combo';
-import ComboCard from '@/components/ComboCard';
-import FilterBar from '@/components/FilterBar';
+import { Link2, Lock, MessageCircle, ShoppingBag, Store } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
-  const [combos, setCombos] = useState<Combo[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5354157794';
-  const filteredCombos = useMemo(
-    () => selectedCategory === 'all'
-      ? combos
-      : combos.filter(combo => combo.category === selectedCategory),
-    [combos, selectedCategory],
-  );
-
-  useEffect(() => {
-    fetchCombos();
-  }, []);
-
-  async function fetchCombos() {
-    try {
-      setError(null);
-      const data = await getPublicCombos();
-      
-      setCombos(data);
-      
-      // Extract unique categories
-      const uniqueCategories = Array.from(new Set(data.map(combo => combo.category)));
-      setCategories(uniqueCategories);
-    } catch (error) {
-      console.error('Error fetching combos:', error);
-      setError(errorMessage(error));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleOrder(combo: Combo) {
-    const message = `¡Hola! Me interesa el combo: *${combo.name}* - ${combo.price.toFixed(2)} ${combo.currency}`;
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-2xl">
-                <ShoppingBag className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Pintury Remesas y Combos
-                </h1>
-                <p className="text-xs md:text-sm text-gray-600">Envíos desde USA • Combos de comida</p>
-              </div>
-            </motion.div>
-
-            <Link href="/admin">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors"
-              >
-                <Lock className="w-4 h-4" />
-                <span className="hidden sm:inline">Admin</span>
-              </motion.button>
-            </Link>
+      <header className="bg-white/80 shadow-md backdrop-blur-md">
+        <div className="container mx-auto flex items-center justify-between px-4 py-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 p-3">
+              <ShoppingBag className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800 md:text-3xl">Pintury</h1>
+              <p className="text-sm text-gray-600">Catálogos de comida por vendedor</p>
+            </div>
           </div>
+          <Link
+            href="/admin"
+            className="flex items-center gap-2 rounded-xl bg-gray-800 px-4 py-2 text-white transition-colors hover:bg-gray-700"
+          >
+            <Lock className="h-4 w-4" />
+            <span className="hidden sm:inline">Administración</span>
+          </Link>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        <motion.div
+      <main className="container mx-auto px-4 py-20">
+        <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="mx-auto max-w-4xl text-center"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Nuestros <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Combos</span>
+          <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-xl">
+            <Store className="h-12 w-12 text-orange-500" />
+          </div>
+          <h2 className="text-4xl font-bold text-gray-800 md:text-6xl">
+            Tu vendedor tiene un catálogo preparado para ti
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6">
-            Comida deliciosa lista para ti. ¡Ordena ahora por WhatsApp!
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 md:text-xl">
+            Solicita su enlace por WhatsApp, ábrelo sin registro y elige tus combos favoritos.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
-            <div className="bg-blue-50 px-6 py-3 rounded-full border-2 border-blue-200">
-              <span className="font-semibold text-blue-700">💵 Recibimos remesas desde USA</span>
-            </div>
-            <div className="bg-orange-50 px-6 py-3 rounded-full border-2 border-orange-200">
-              <span className="font-semibold text-orange-700">🍗 Combos de comida frescos</span>
-            </div>
-          </div>
-        </motion.div>
 
-        <FilterBar
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
-
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-500"></div>
-          </div>
-        ) : error ? (
-          <div className="mx-auto max-w-xl rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-            <h3 className="text-xl font-bold text-red-700">No pudimos cargar los combos</h3>
-            <p className="mt-2 text-red-600">{error}</p>
-            <button
-              onClick={fetchCombos}
-              className="mt-5 rounded-xl bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-700"
-            >
-              Intentar de nuevo
-            </button>
-          </div>
-        ) : filteredCombos.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
-          >
-            <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-600 mb-2">No hay combos disponibles</h3>
-            <p className="text-gray-500">Vuelve pronto para ver nuevas ofertas</p>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCombos.map((combo) => (
-              <ComboCard key={combo.id} combo={combo} onOrder={handleOrder} />
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {[
+              { icon: MessageCircle, title: 'Recibe el enlace', text: 'Tu vendedor te lo enviará directamente por WhatsApp.' },
+              { icon: Link2, title: 'Abre su catálogo', text: 'Verás únicamente las ofertas publicadas por ese vendedor.' },
+              { icon: ShoppingBag, title: 'Realiza tu pedido', text: 'Pide el combo desde el botón de WhatsApp del catálogo.' },
+            ].map(({ icon: Icon, title, text }) => (
+              <div key={title} className="rounded-2xl bg-white p-6 text-left shadow-lg">
+                <Icon className="mb-4 h-8 w-8 text-orange-500" />
+                <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-gray-600">{text}</p>
+              </div>
             ))}
           </div>
-        )}
+        </motion.section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12 mt-20">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h3 className="text-2xl font-bold mb-4">Pintury Remesas y Combos</h3>
-              <p className="text-gray-300 mb-4">
-                Tu solución completa para recibir remesas desde Estados Unidos y disfrutar de los mejores combos de comida en Cuba.
-              </p>
-              <div className="space-y-2 text-sm text-gray-400">
-                <p>🇺🇸 Recibimos y entregamos dinero desde USA</p>
-                <p>🍗 Combos de comida fresca y deliciosa</p>
-                <p>⚡ Servicio rápido y confiable</p>
-              </div>
-            </div>
-            <div className="text-center md:text-right">
-              <p className="text-lg mb-4 font-semibold">¿Tienes alguna pregunta?</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full inline-flex items-center gap-2 transition-colors shadow-lg"
-              >
-                Contáctanos por WhatsApp
-              </motion.button>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 pt-6 text-center">
-            <p className="text-sm text-gray-400">
-              © 2026 Pintury Remesas y Combos. Todos los derechos reservados.
-            </p>
-          </div>
-        </div>
+      <footer className="mt-16 bg-gray-800 py-8 text-center text-sm text-gray-400">
+        © 2026 Pintury Remesas y Combos. Todos los derechos reservados.
       </footer>
     </div>
   );

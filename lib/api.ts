@@ -1,4 +1,5 @@
 import { Combo, ComboFormData } from '@/types/combo';
+import { AuthUser, Seller, SellerFormData, SellerIdentity } from '@/types/seller';
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/api/v1')
   .replace(/\/$/, '');
@@ -10,7 +11,12 @@ type LoginResponse = {
   token: string;
   token_type: 'Bearer';
   expires_in: number;
-  admin: { email: string };
+  user: AuthUser;
+};
+
+export type PublicCatalog = {
+  seller: Pick<SellerIdentity, 'name' | 'slug' | 'whatsapp'>;
+  combos: Combo[];
 };
 
 export class ApiError extends Error {
@@ -95,8 +101,8 @@ function toFormData(values: ComboFormData): FormData {
   return data;
 }
 
-export async function getPublicCombos(): Promise<Combo[]> {
-  return (await request<ApiEnvelope<Combo[]>>('/combos')).data;
+export async function getPublicCatalog(slug: string): Promise<PublicCatalog> {
+  return (await request<ApiEnvelope<PublicCatalog>>(`/public/sellers/${encodeURIComponent(slug)}`)).data;
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
@@ -110,8 +116,8 @@ export async function login(email: string, password: string): Promise<LoginRespo
   return response;
 }
 
-export async function verifyAdminSession(): Promise<void> {
-  await request<ApiEnvelope<{ email: string }>>('/auth/me', {}, true);
+export async function verifyAdminSession(): Promise<AuthUser> {
+  return (await request<ApiEnvelope<AuthUser>>('/auth/me', {}, true)).data;
 }
 
 export async function logout(): Promise<void> {
@@ -128,6 +134,27 @@ export async function logout(): Promise<void> {
 
 export async function getAdminCombos(): Promise<Combo[]> {
   return (await request<ApiEnvelope<Combo[]>>('/admin/combos', {}, true)).data;
+}
+
+export async function getSellers(): Promise<Seller[]> {
+  return (await request<ApiEnvelope<Seller[]>>('/admin/sellers', {}, true)).data;
+}
+
+export async function createSeller(values: SellerFormData): Promise<Seller> {
+  return (await request<ApiEnvelope<Seller>>('/admin/sellers', {
+    method: 'POST',
+    body: JSON.stringify(values),
+  }, true)).data;
+}
+
+export async function updateSeller(
+  id: string,
+  values: Partial<SellerFormData & Pick<Seller, 'active'>>,
+): Promise<Seller> {
+  return (await request<ApiEnvelope<Seller>>(`/admin/sellers/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(values),
+  }, true)).data;
 }
 
 export async function getAdminCombo(id: string): Promise<Combo> {
