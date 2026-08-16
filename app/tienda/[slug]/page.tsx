@@ -54,7 +54,7 @@ export default function SellerCatalogPage() {
     if (!catalog) return;
 
     const message = combo
-      ? `¡Hola! Me interesa el combo: *${combo.name}* - ${combo.price.toFixed(2)} ${combo.currency}`
+      ? `¡Hola! Me interesa el producto: *${combo.name}* - ${combo.price.toFixed(2)} ${combo.currency}`
       : `¡Hola! Vi el catálogo de ${catalog.seller.name} y quisiera más información.`;
     window.open(
       `https://wa.me/${catalog.seller.whatsapp}?text=${encodeURIComponent(message)}`,
@@ -107,7 +107,7 @@ export default function SellerCatalogPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-800 md:text-3xl">{catalog.seller.name}</h1>
-              <p className="text-xs text-gray-500 md:text-sm">Catálogo de combos</p>
+              <p className="text-xs text-gray-500 md:text-sm">Catálogo de productos</p>
             </div>
           </div>
           <button
@@ -122,7 +122,7 @@ export default function SellerCatalogPage() {
 
       <main className="container mx-auto px-4 py-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
-          <h2 className="text-4xl font-bold text-gray-800 md:text-5xl">Combos disponibles</h2>
+          <h2 className="text-4xl font-bold text-gray-800 md:text-5xl">Productos disponibles</h2>
           <p className="mt-3 text-lg text-gray-600">Elige tu favorito y realiza el pedido por WhatsApp.</p>
         </motion.div>
 
@@ -135,7 +135,7 @@ export default function SellerCatalogPage() {
         {filteredCombos.length === 0 ? (
           <div className="py-20 text-center">
             <ShoppingBag className="mx-auto mb-4 h-24 w-24 text-gray-300" />
-            <h3 className="text-2xl font-bold text-gray-600">No hay combos disponibles</h3>
+            <h3 className="text-2xl font-bold text-gray-600">No hay productos disponibles</h3>
             <p className="mt-2 text-gray-500">Vuelve pronto para ver nuevas ofertas.</p>
           </div>
         ) : (

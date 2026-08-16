@@ -19,7 +19,7 @@ export default function EditarComboPage() {
     description: '',
     price: 0,
     currency: 'USD',
-    category: 'general',
+    category: 'combos',
     available: true,
     image: null,
   });
@@ -79,7 +79,7 @@ export default function EditarComboPage() {
   if (!combo) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center">
-        <p className="text-xl text-gray-600">Cargando combo...</p>
+        <p className="text-xl text-gray-600">Cargando producto...</p>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export default function EditarComboPage() {
               </motion.button>
             </Link>
             <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Editar Combo
+              Editar Producto
             </h1>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function EditarComboPage() {
           <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre del Combo
+                Nombre del Producto
               </label>
               <input
                 type="text"
@@ -175,12 +175,18 @@ export default function EditarComboPage() {
                 <input
                   type="text"
                   id="category"
+                  list="product-categories"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="ej: familiar, individual"
+                  placeholder="ej: combos, otros"
                   required
                 />
+                <datalist id="product-categories">
+                  <option value="combos" />
+                  <option value="otros" />
+                </datalist>
+                <p className="mt-1 text-xs text-gray-500">Puedes usar “combos”, “otros” o escribir otra categoría.</p>
               </div>
             </div>
 

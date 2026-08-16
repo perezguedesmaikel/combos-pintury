@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Pintury Remesas y Combos",
-  description: "Combos de comida para tus familiares en Cuba.",
+  description: "Productos de comida para tus familiares en Cuba.",
 };
 
 export default function RootLayout({

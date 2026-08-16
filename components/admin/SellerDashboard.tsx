@@ -40,7 +40,7 @@ export default function SellerDashboard({ user, onLogout }: Props) {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Estás seguro de eliminar este combo?')) return;
+    if (!confirm('¿Estás seguro de eliminar este producto?')) return;
 
     try {
       await deleteCombo(id);
@@ -85,12 +85,12 @@ export default function SellerDashboard({ user, onLogout }: Props) {
         </section>
 
         <Link href="/admin/combos/nuevo" className="mb-8 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 font-bold text-white shadow-lg">
-          <Plus className="h-5 w-5" /> Agregar nuevo combo
+          <Plus className="h-5 w-5" /> Agregar nuevo producto
         </Link>
 
         {error && <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>}
         {loading ? (
-          <div className="py-20 text-center text-gray-500">Cargando combos...</div>
+          <div className="py-20 text-center text-gray-500">Cargando productos...</div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {combos.map(combo => (
@@ -104,7 +104,7 @@ export default function SellerDashboard({ user, onLogout }: Props) {
                     <h2 className="text-xl font-bold text-gray-800">{combo.name}</h2>
                     <span className="font-bold text-orange-600">{combo.price.toFixed(2)} {combo.currency}</span>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm text-gray-600">{combo.description}</p>
+                  <p className="mt-2 whitespace-pre-line break-words text-sm text-gray-600">{combo.description}</p>
                   <div className="mt-5 flex gap-2">
                     <Link href={`/admin/combos/${combo.id}`} className="flex-1 rounded-lg bg-blue-500 py-2 text-center text-white"><Edit2 className="mr-1 inline h-4 w-4" /> Editar</Link>
                     <button onClick={() => handleDelete(combo.id)} className="flex-1 rounded-lg bg-red-500 py-2 text-white"><Trash2 className="mr-1 inline h-4 w-4" /> Eliminar</button>
@@ -115,7 +115,7 @@ export default function SellerDashboard({ user, onLogout }: Props) {
           </div>
         )}
 
-        {!loading && combos.length === 0 && <div className="py-20 text-center"><p className="text-xl text-gray-600">No has creado combos todavía</p><p className="mt-2 text-gray-500">Agrega el primero para comenzar a compartir tu catálogo.</p></div>}
+        {!loading && combos.length === 0 && <div className="py-20 text-center"><p className="text-xl text-gray-600">No has creado productos todavía</p><p className="mt-2 text-gray-500">Agrega el primero para comenzar a compartir tu catálogo.</p></div>}
       </main>
     </div>
   );

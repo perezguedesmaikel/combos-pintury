@@ -17,7 +17,7 @@ export default function NuevoComboPage() {
     description: '',
     price: 0,
     currency: 'USD',
-    category: 'general',
+    category: 'combos',
     available: true,
     image: null,
   });
@@ -67,7 +67,7 @@ export default function NuevoComboPage() {
               </motion.button>
             </Link>
             <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Crear Nuevo Combo
+              Crear Nuevo Producto
             </h1>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function NuevoComboPage() {
           <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre del Combo
+                Nombre del Producto
               </label>
               <input
                 type="text"
@@ -141,12 +141,18 @@ export default function NuevoComboPage() {
                 <input
                   type="text"
                   id="category"
+                  list="product-categories"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-2 border text-blue-950 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="ej: familiar, individual"
+                  placeholder="ej: combos, otros"
                   required
                 />
+                <datalist id="product-categories">
+                  <option value="combos" />
+                  <option value="otros" />
+                </datalist>
+                <p className="mt-1 text-xs text-gray-500">Puedes usar “combos”, “otros” o escribir otra categoría.</p>
               </div>
             </div>
 
@@ -206,7 +212,7 @@ export default function NuevoComboPage() {
                 className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
               >
                 <Save className="w-5 h-5 flex-shrink-0" />
-                <span className="whitespace-nowrap">{loading ? 'Guardando...' : 'Crear Combo'}</span>
+                <span className="whitespace-nowrap">{loading ? 'Guardando...' : 'Crear Producto'}</span>
               </button>
             </div>
           </form>

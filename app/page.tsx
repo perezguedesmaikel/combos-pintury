@@ -41,14 +41,14 @@ export default function Home() {
             Tu vendedor tiene un catálogo preparado para ti
           </h2>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 md:text-xl">
-            Solicita su enlace por WhatsApp, ábrelo sin registro y elige tus combos favoritos.
+            Solicita su enlace por WhatsApp, ábrelo sin registro y elige tus productos favoritos.
           </p>
 
           <div className="mt-12 grid gap-5 md:grid-cols-3">
             {[
               { icon: MessageCircle, title: 'Recibe el enlace', text: 'Tu vendedor te lo enviará directamente por WhatsApp.' },
               { icon: Link2, title: 'Abre su catálogo', text: 'Verás únicamente las ofertas publicadas por ese vendedor.' },
-              { icon: ShoppingBag, title: 'Realiza tu pedido', text: 'Pide el combo desde el botón de WhatsApp del catálogo.' },
+              { icon: ShoppingBag, title: 'Realiza tu pedido', text: 'Pide el producto desde el botón de WhatsApp del catálogo.' },
             ].map(({ icon: Icon, title, text }) => (
               <div key={title} className="rounded-2xl bg-white p-6 text-left shadow-lg">
                 <Icon className="mb-4 h-8 w-8 text-orange-500" />

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
@@ -11,12 +12,15 @@ interface ComboCardProps {
 }
 
 export default function ComboCard({ combo, onOrder }: ComboCardProps) {
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const hasLongDescription = combo.description.length > 80;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
+      className="bg-white rounded-2xl shadow-lg overflow-hidden group"
     >
       <div className="relative h-64 overflow-hidden bg-gradient-to-br from-orange-100 to-red-100">
         {combo.image_url ? (
@@ -46,7 +50,26 @@ export default function ComboCard({ combo, onOrder }: ComboCardProps) {
           </span>
         </div>
 
-        <p className="text-gray-600 mb-4 line-clamp-2">{combo.description}</p>
+        <p
+          className={`whitespace-pre-line break-words text-gray-600 ${
+            descriptionExpanded ? '' : 'line-clamp-3'
+          }`}
+        >
+          {combo.description}
+        </p>
+
+        {hasLongDescription && (
+          <button
+            type="button"
+            onClick={() => setDescriptionExpanded(current => !current)}
+            aria-expanded={descriptionExpanded}
+            className="mb-4 mt-2 text-sm font-semibold text-orange-600 underline-offset-4 hover:underline"
+          >
+            {descriptionExpanded ? 'Mostrar menos' : 'Ver descripción completa'}
+          </button>
+        )}
+
+        {!hasLongDescription && <div className="mb-4" />}
 
         <motion.button
           whileHover={{ scale: 1.05 }}
